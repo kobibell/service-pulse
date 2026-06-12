@@ -95,12 +95,22 @@ struct ContentView: View {
                                 ServiceRow(
                                     service: service,
                                     status: monitor.status(for: service),
-                                    latency: monitor.latency(for: service)
+                                    latency: monitor.latency(for: service),
+                                    lastChecked: monitor.lastChecked(for: service),
+                                    statusSince: monitor.statusSince(for: service)
                                 )
                                 .contentShape(Rectangle())
                                 .onTapGesture {
                                     editingService = service
                                 }
+
+                                Button {
+                                    monitor.togglePause(service)
+                                } label: {
+                                    Image(systemName: service.isPaused ? "play.circle.fill" : "pause.circle.fill")
+                                        .foregroundStyle(.secondary)
+                                }
+                                .buttonStyle(.plain)
 
                                 Button {
                                     monitor.removeService(service)

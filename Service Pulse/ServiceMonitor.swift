@@ -12,6 +12,8 @@ final class ServiceMonitor: ObservableObject {
     @Published var services: [Service] = []
     @Published var statuses: [UUID: ServiceStatus] = [:]
     @Published var latencies: [UUID: Double] = [:]
+    @Published var lastChecked: [UUID: Date] = [:]
+    @Published var statusSince: [UUID: Date] = [:]
     @Published var overallStatus: OverallStatus = .unknown
     @Published var isRefreshing: Bool = false
 
@@ -58,6 +60,10 @@ final class ServiceMonitor: ObservableObject {
 
         Task {
             for service in currentServices {
+                if service.isPaused {
+                    continue
+                }
+
                 let previousStatus = statuses[service.id] ?? .unknown
 
                 switch service.type {
@@ -91,9 +97,14 @@ final class ServiceMonitor: ObservableObject {
                     latencies[service.id] = nil
                 }
 
+                lastChecked[service.id] = Date()
+
                 // Skip the notification on first run, since "unknown -> up/down"
                 // for a freshly-added service isn't a real state change.
                 let newStatus = statuses[service.id] ?? .unknown
+                if newStatus != previousStatus {
+                    statusSince[service.id] = Date()
+                }
                 if previousStatus != .unknown && previousStatus != newStatus {
                     notifyStatusChange(service: service, newStatus: newStatus)
                 }
@@ -120,6 +131,17 @@ final class ServiceMonitor: ObservableObject {
         pollNow()
     }
 
+    func togglePause(_ service: Service) {
+        guard let index = services.firstIndex(where: { $0.id == service.id }) else { return }
+        services[index].isPaused.toggle()
+        if services[index].isPaused {
+            statuses[service.id] = .unknown
+            latencies[service.id] = nil
+        }
+        save()
+        updateOverallStatus()
+    }
+
     func removeService(_ service: Service) {
         services.removeAll { $0.id == service.id }
         statuses.removeValue(forKey: service.id)
@@ -134,6 +156,14 @@ final class ServiceMonitor: ObservableObject {
 
     func latency(for service: Service) -> Double? {
         latencies[service.id]
+    }
+
+    func lastChecked(for service: Service) -> Date? {
+        lastChecked[service.id]
+    }
+
+    func statusSince(for service: Service) -> Date? {
+        statusSince[service.id]
     }
 
     private func updateOverallStatus() {
