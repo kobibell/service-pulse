@@ -73,6 +73,16 @@ warning entirely.
 Service Pulse needs to run `/sbin/ping` and talk to `/var/run/docker.sock` directly, both of which
 are restricted under the App Sandbox. It's distributed outside the App Store as a result.
 
+## Roadmap
+
+- [ ] Launch at login
+- [ ] HTTP/HTTPS endpoint checks
+- [ ] Configurable poll interval
+- [ ] Per-container Docker monitoring
+- [ ] Notarized builds
+
+Have an idea? [Open an issue](../../issues).
+
 ## Support this project
 
 Service Pulse is free and open source. If you find it useful, consider supporting development:
