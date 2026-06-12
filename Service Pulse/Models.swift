@@ -8,11 +8,13 @@ import Foundation
 enum ServiceType: String, Codable, CaseIterable {
     case ping
     case docker
+    case appleContainer
 
     var displayName: String {
         switch self {
         case .ping: return "Ping"
         case .docker: return "Docker"
+        case .appleContainer: return "Mac Containers"
         }
     }
 }

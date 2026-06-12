@@ -13,6 +13,11 @@ struct AddServiceView: View {
     @State private var type: ServiceType = .ping
     @State private var host: String = ""
 
+    // Only offer Apple container checks when the CLI is actually installed.
+    private var availableTypes: [ServiceType] {
+        ServiceType.allCases.filter { $0 != .appleContainer || AppleContainerChecker.isAvailable }
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Add Service")
@@ -23,7 +28,7 @@ struct AddServiceView: View {
                     .textFieldStyle(.roundedBorder)
 
                 Picker("Type", selection: $type) {
-                    ForEach(ServiceType.allCases, id: \.self) { type in
+                    ForEach(availableTypes, id: \.self) { type in
                         Text(type.displayName).tag(type)
                     }
                 }

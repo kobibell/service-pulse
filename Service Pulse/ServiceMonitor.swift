@@ -70,6 +70,17 @@ final class ServiceMonitor: ObservableObject {
                         statuses[service.id] = .unknown
                     }
                     latencies[service.id] = nil
+
+                case .appleContainer:
+                    let result = await Task.detached {
+                        AppleContainerChecker.listContainers()
+                    }.value
+                    if let containers = result {
+                        statuses[service.id] = AppleContainerChecker.overallStatus(for: containers)
+                    } else {
+                        statuses[service.id] = .unknown
+                    }
+                    latencies[service.id] = nil
                 }
 
                 // Skip the notification on first run, since "unknown -> up/down"
