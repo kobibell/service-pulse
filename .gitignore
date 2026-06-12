@@ -16,3 +16,4 @@ xcuserdata/
 *.xcscmblueprint
 .swiftpm/
 .claude/
+/design/
