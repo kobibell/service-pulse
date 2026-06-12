@@ -43,6 +43,35 @@ struct ContentView: View {
                 }
                 .buttonStyle(.plain)
                 .disabled(monitor.isRefreshing)
+
+                Menu {
+                    Toggle("Launch at Login", isOn: $launchAtLogin)
+                        .onChange(of: launchAtLogin) { _, newValue in
+                            LaunchAtLogin.set(newValue)
+                        }
+
+                    Menu("Refresh Every") {
+                        Picker("", selection: $monitor.pollInterval) {
+                            Text("10 seconds").tag(10.0)
+                            Text("30 seconds").tag(30.0)
+                            Text("1 minute").tag(60.0)
+                            Text("5 minutes").tag(300.0)
+                        }
+                        .labelsHidden()
+                        .pickerStyle(.inline)
+                    }
+
+                    Divider()
+
+                    Button("Quit Service Pulse") {
+                        NSApplication.shared.terminate(nil)
+                    }
+                } label: {
+                    Image(systemName: "gearshape")
+                }
+                .menuStyle(.borderlessButton)
+                .menuIndicator(.hidden)
+                .frame(width: 16)
             }
             .padding()
 
@@ -84,31 +113,17 @@ struct ContentView: View {
 
             Divider()
 
-            HStack {
-                Toggle("Launch at Login", isOn: $launchAtLogin)
-                    .toggleStyle(.checkbox)
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
-                    .onChange(of: launchAtLogin) { _, newValue in
-                        LaunchAtLogin.set(newValue)
-                    }
-
-                Spacer()
-            }
-            .padding(.horizontal)
-            .padding(.top, 8)
-
-            HStack {
-                Button("Add Service") {
-                    showingAddForm = true
+            Button {
+                showingAddForm = true
+            } label: {
+                HStack {
+                    Image(systemName: "plus.circle")
+                    Text("Add Service")
+                    Spacer()
                 }
-
-                Spacer()
-
-                Button("Quit") {
-                    NSApplication.shared.terminate(nil)
-                }
+                .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
             .padding()
         }
     }

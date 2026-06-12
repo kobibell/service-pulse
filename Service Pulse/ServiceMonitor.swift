@@ -16,7 +16,13 @@ final class ServiceMonitor: ObservableObject {
     @Published var isRefreshing: Bool = false
 
     private var timer: AnyCancellable?
-    private let pollInterval: TimeInterval = 30
+
+    @Published var pollInterval: TimeInterval {
+        didSet {
+            UserDefaults.standard.set(pollInterval, forKey: "pollInterval")
+            startPolling()
+        }
+    }
 
     private let fileManager = FileManager.default
 
@@ -30,6 +36,8 @@ final class ServiceMonitor: ObservableObject {
     }
 
     init() {
+        let savedInterval = UserDefaults.standard.double(forKey: "pollInterval")
+        pollInterval = savedInterval > 0 ? savedInterval : 30
         load()
         requestNotificationPermission()
         startPolling()
