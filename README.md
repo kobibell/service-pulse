@@ -31,24 +31,31 @@ The menubar icon reflects overall status:
 
 ## Installation
 
-Service Pulse isn't notarized yet, so for now the recommended way to run it is to build it
-yourself — this avoids the macOS Gatekeeper warning entirely, since locally-built apps aren't
-quarantined.
-
-1. Clone the repo:
+1. Download the latest DMG from the [Releases](../../releases) page
+2. Open the DMG and drag **Service Pulse** into your Applications folder
+3. Service Pulse isn't notarized yet, so macOS will block it on first launch with a
+   "cannot be opened" message. To allow it, open Terminal and run:
    ```bash
-   git clone https://github.com/kobibell/service-pulse.git
-   cd service-pulse
+   xattr -cr "/Applications/Service Pulse.app"
    ```
-2. Open `Service Pulse.xcodeproj` in Xcode (16+)
-3. Build and run (⌘R)
+   Then open the app again from Applications. (Alternatively, go to **System Settings →
+   Privacy & Security** and click **Open Anyway** next to the warning.)
 
 The app will launch and appear in your menu bar — no Dock icon, since it's a menubar-only app.
 
-A pre-built DMG is also available on the [Releases](../../releases) page, but since it isn't
-notarized, macOS will block it on first launch. If you go that route, see
-[Privacy & Security in System Settings](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unidentified-developer-mh40616/mac)
-for how to allow it, or run `xattr -cr "/Applications/Service Pulse.app"` from Terminal.
+### Building from source
+
+If you'd rather not run the `xattr` command, or want to make changes, you can build it
+yourself with Xcode (16+):
+
+```bash
+git clone https://github.com/kobibell/service-pulse.git
+cd service-pulse
+open "Service Pulse.xcodeproj"
+```
+
+Then build and run (⌘R). Locally-built apps aren't quarantined, so this skips the Gatekeeper
+warning entirely.
 
 ## Usage
 
