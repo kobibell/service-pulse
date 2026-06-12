@@ -8,6 +8,7 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject var monitor: ServiceMonitor
     @State private var showingAddForm = false
+    @State private var launchAtLogin = LaunchAtLogin.isEnabled
 
     var body: some View {
         Group {
@@ -82,6 +83,20 @@ struct ContentView: View {
             }
 
             Divider()
+
+            HStack {
+                Toggle("Launch at Login", isOn: $launchAtLogin)
+                    .toggleStyle(.checkbox)
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .onChange(of: launchAtLogin) { _, newValue in
+                        LaunchAtLogin.set(newValue)
+                    }
+
+                Spacer()
+            }
+            .padding(.horizontal)
+            .padding(.top, 8)
 
             HStack {
                 Button("Add Service") {
