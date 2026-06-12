@@ -30,7 +30,7 @@ The menubar icon reflects overall status:
 
 ## Requirements
 
-- macOS 13.0 or later
+- macOS 15.5 or later
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (only if you want to monitor containers)
 
 ## Installation
