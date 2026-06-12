@@ -5,16 +5,14 @@
 # Usage:
 #   ./scripts/build-dmg.sh
 #
-# Notarization (optional, requires a paid Apple Developer account):
-#   Once you have a Developer ID Application certificate, set these env vars
-#   before running this script to enable notarization + stapling:
-#     NOTARIZE=1
-#     APPLE_ID="you@example.com"
-#     APPLE_TEAM_ID="DJ5F2VD3UK"
-#     APPLE_APP_PASSWORD="app-specific-password"
+# Notarization (needs a paid Apple Developer account + Developer ID cert):
+#   NOTARIZE=1
+#   APPLE_ID="you@example.com"
+#   APPLE_TEAM_ID="DJ5F2VD3UK"
+#   APPLE_APP_PASSWORD="app-specific-password"
 #
-# Without notarization, users will need to right-click the app and choose
-# "Open" the first time (Gatekeeper warning) since it isn't from the App Store.
+# Without it, users have to bypass the Gatekeeper warning on first launch
+# since the app isn't from the App Store.
 
 set -euo pipefail
 
