@@ -9,34 +9,37 @@ import SwiftUI
 /// arc, drawn at template size so it tints correctly in the menu bar.
 struct RadarGlyph: View {
     var body: some View {
-        Canvas { context, size in
-            let center = CGPoint(x: size.width / 2, y: size.height / 2)
-            let maxRadius = min(size.width, size.height) / 2
-
-            for fraction in [1.0, 0.66, 0.33] {
-                let radius = maxRadius * fraction
-                let rect = CGRect(x: center.x - radius, y: center.y - radius, width: radius * 2, height: radius * 2)
-                context.stroke(Path(ellipseIn: rect), with: .style(.foreground), lineWidth: 1)
+        ZStack {
+            ForEach([1.0, 0.66, 0.33], id: \.self) { fraction in
+                Circle()
+                    .stroke(lineWidth: 1)
+                    .frame(width: 16 * fraction, height: 16 * fraction)
             }
 
-            var sweep = Path()
-            sweep.move(to: center)
-            sweep.addLine(to: CGPoint(x: center.x, y: center.y - maxRadius))
-            sweep.addArc(
-                center: center,
-                radius: maxRadius,
-                startAngle: .degrees(-90),
-                endAngle: .degrees(-20),
-                clockwise: false
-            )
-            sweep.closeSubpath()
-            context.fill(sweep, with: .style(.foreground.opacity(0.35)))
+            Pie(startAngle: .degrees(-90), endAngle: .degrees(-20))
+                .fill(.primary.opacity(0.35))
+                .frame(width: 16, height: 16)
 
-            let dotRadius: CGFloat = 1
-            let dotRect = CGRect(x: center.x - dotRadius, y: center.y - dotRadius, width: dotRadius * 2, height: dotRadius * 2)
-            context.fill(Path(ellipseIn: dotRect), with: .style(.foreground))
+            Circle()
+                .frame(width: 2, height: 2)
         }
         .frame(width: 16, height: 16)
+    }
+}
+
+private struct Pie: Shape {
+    let startAngle: Angle
+    let endAngle: Angle
+
+    func path(in rect: CGRect) -> Path {
+        let center = CGPoint(x: rect.midX, y: rect.midY)
+        let radius = min(rect.width, rect.height) / 2
+
+        var path = Path()
+        path.move(to: center)
+        path.addArc(center: center, radius: radius, startAngle: startAngle, endAngle: endAngle, clockwise: false)
+        path.closeSubpath()
+        return path
     }
 }
 
