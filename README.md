@@ -76,13 +76,13 @@ are restricted under the App Sandbox. It's distributed outside the App Store as 
 ## Roadmap
 
 **v1.0.1 — shipped**
-- [x] Launch at login
-- [x] Mac Containers support — monitor containers run with Apple's native
+- [x] ~~Launch at login~~
+- [x] ~~Mac Containers support~~ — monitor containers run with Apple's native
       [container](https://github.com/apple/container) tool (Apple Silicon, macOS 26+)
 
 **v1.1 — quality of life**
-- [ ] Configurable poll interval
-- [ ] Edit existing services
+- [x] ~~Configurable poll interval~~
+- [x] ~~Edit existing services~~
 - [ ] Pause monitoring
 - [ ] Status timestamps ("down since…", "last checked…")
 
