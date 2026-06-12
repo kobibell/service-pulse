@@ -50,6 +50,14 @@ struct ContentView: View {
                 .disabled(monitor.isRefreshing)
 
                 Menu {
+                    if let update = monitor.availableUpdate {
+                        Button("Update available: v\(update.version)") {
+                            NSWorkspace.shared.open(update.url)
+                        }
+
+                        Divider()
+                    }
+
                     Toggle("Launch at Login", isOn: $launchAtLogin)
                         .onChange(of: launchAtLogin) { _, newValue in
                             LaunchAtLogin.set(newValue)

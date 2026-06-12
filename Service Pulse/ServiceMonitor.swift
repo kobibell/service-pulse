@@ -16,6 +16,7 @@ final class ServiceMonitor: ObservableObject {
     @Published var statusSince: [UUID: Date] = [:]
     @Published var overallStatus: OverallStatus = .unknown
     @Published var isRefreshing: Bool = false
+    @Published var availableUpdate: AvailableUpdate?
 
     private var timer: AnyCancellable?
 
@@ -44,6 +45,10 @@ final class ServiceMonitor: ObservableObject {
         requestNotificationPermission()
         startPolling()
         pollNow()
+
+        Task {
+            availableUpdate = await UpdateChecker.checkForUpdate()
+        }
     }
 
     func startPolling() {
