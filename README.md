@@ -80,11 +80,11 @@ are restricted under the App Sandbox. It's distributed outside the App Store as 
 - [x] ~~Mac Containers support~~ — monitor containers run with Apple's native
       [container](https://github.com/apple/container) tool (Apple Silicon, macOS 26+)
 
-**v1.1 — quality of life**
+**v1.1 — shipped**
 - [x] ~~Configurable poll interval~~
 - [x] ~~Edit existing services~~
-- [ ] Pause monitoring
-- [ ] Status timestamps ("down since…", "last checked…")
+- [x] ~~Pause monitoring~~
+- [x] ~~Status timestamps ("down since…", "last checked…")~~
 
 **v1.2 — more check types**
 - [ ] HTTP/HTTPS endpoint checks with response codes and timing
