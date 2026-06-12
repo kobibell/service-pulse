@@ -41,7 +41,21 @@ The menubar icon reflects overall status:
 2. Open `Service Pulse.xcodeproj` in Xcode
 3. Build and run (⌘R)
 
-A pre-built, notarized DMG will be available on the [Releases](../../releases) page.
+### Download the DMG
+
+Pre-built DMGs are available on the [Releases](../../releases) page. The app isn't notarized yet,
+so macOS Gatekeeper will say it "cannot be opened because Apple cannot check it for malicious
+software." To open it anyway:
+
+1. Try to open the app once (it'll be blocked)
+2. Go to **System Settings → Privacy & Security**, scroll down to the Security section
+3. Click **Open Anyway** next to "Service Pulse was blocked"
+
+Or from Terminal, after copying the app to `/Applications`:
+
+```bash
+xattr -cr "/Applications/Service Pulse.app"
+```
 
 ## Usage
 
@@ -53,8 +67,7 @@ A pre-built, notarized DMG will be available on the [Releases](../../releases) p
 ## Why no sandbox?
 
 Service Pulse needs to run `/sbin/ping` and talk to `/var/run/docker.sock` directly, both of which
-are restricted under the App Sandbox. The app is notarized and signed, but distributed outside the
-App Store as a result.
+are restricted under the App Sandbox. It's distributed outside the App Store as a result.
 
 ## Support this project
 
