@@ -37,4 +37,22 @@ struct Service: Identifiable, Codable {
     var name: String
     var type: ServiceType
     var host: String
+    var isPaused: Bool = false
+
+    init(id: UUID = UUID(), name: String, type: ServiceType, host: String, isPaused: Bool = false) {
+        self.id = id
+        self.name = name
+        self.type = type
+        self.host = host
+        self.isPaused = isPaused
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        type = try container.decode(ServiceType.self, forKey: .type)
+        host = try container.decode(String.self, forKey: .host)
+        isPaused = try container.decodeIfPresent(Bool.self, forKey: .isPaused) ?? false
+    }
 }
