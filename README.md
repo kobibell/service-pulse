@@ -73,33 +73,13 @@ warning entirely.
 Service Pulse needs to run `/sbin/ping` and talk to `/var/run/docker.sock` directly, both of which
 are restricted under the App Sandbox. It's distributed outside the App Store as a result.
 
-## Roadmap
+## Releases
 
-**v1.0.1 — shipped**
-- [x] ~~Launch at login~~
-- [x] ~~Mac Containers support~~ — monitor containers run with Apple's native
-      [container](https://github.com/apple/container) tool (Apple Silicon, macOS 26+)
+See the [Releases](../../releases) page for download links and patch notes for each version.
+The app also checks for updates on launch and will show a link in the menu when a newer
+version is available.
 
-**v1.1 — shipped**
-- [x] ~~Configurable poll interval~~
-- [x] ~~Edit existing services~~
-- [x] ~~Pause monitoring~~
-- [x] ~~Status timestamps ("down since…", "last checked…")~~
-
-**v1.2 — more check types**
-- [ ] HTTP/HTTPS endpoint checks with response codes and timing
-- [ ] TCP port checks
-- [ ] Per-container Docker monitoring
-
-**Later**
-- [ ] Latency history / sparklines
-- [ ] Menu bar status detail (latency or down-count next to the icon)
-- [ ] Export/import service config
-- [ ] Notarized builds + auto-updates
-- [ ] Homebrew cask
-- [ ] Webhook / Slack notifications
-
-Have an idea? [Open an issue](../../issues).
+For planned features, see the [Roadmap](ROADMAP.md).
 
 ## Support this project
 
