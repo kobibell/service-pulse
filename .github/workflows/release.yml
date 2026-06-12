@@ -1,0 +1,39 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    runs-on: macos-15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Archive
+        run: |
+          xcodebuild archive \
+            -project "Service Pulse.xcodeproj" \
+            -scheme "Service Pulse" \
+            -configuration Release \
+            -archivePath "build/Service Pulse.xcarchive" \
+            CODE_SIGN_IDENTITY="-" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=YES \
+            | { grep -E "error:|warning:|BUILD" || true; }
+
+      - name: Package DMG
+        run: |
+          APP_NAME="Service Pulse"
+          mkdir -p build/dmg-staging
+          cp -R "build/$APP_NAME.xcarchive/Products/Applications/$APP_NAME.app" build/dmg-staging/
+          ln -s /Applications "build/dmg-staging/Applications"
+          hdiutil create -volname "$APP_NAME" -srcfolder build/dmg-staging -ov -format UDZO "build/$APP_NAME.dmg"
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ github.ref_name }}" "build/Service Pulse.dmg" \
+            --title "${{ github.ref_name }}" \
+            --generate-notes
