@@ -5,6 +5,10 @@ A lightweight macOS menubar app that monitors your services and shows their heal
 ![status: green/yellow/red](https://img.shields.io/badge/status-active-brightgreen)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
+<p align="center">
+  <img src="docs/screenshot.png" alt="Service Pulse menubar dropdown showing ping and Docker service statuses" width="420">
+</p>
+
 ## What it does
 
 Service Pulse sits in your menu bar and keeps an eye on the things you care about:

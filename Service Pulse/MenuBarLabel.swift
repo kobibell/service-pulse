@@ -9,7 +9,8 @@ struct MenuBarLabel: View {
     let status: OverallStatus
 
     var body: some View {
-        Image(systemName: "antenna.radiowaves.left.and.right")
+        // "scope" reads like a radar screen, matching the app icon.
+        Image(systemName: "scope")
             .foregroundStyle(statusColor)
     }
 
