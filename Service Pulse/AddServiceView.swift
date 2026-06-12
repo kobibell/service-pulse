@@ -7,11 +7,20 @@ import SwiftUI
 
 struct AddServiceView: View {
     @EnvironmentObject var monitor: ServiceMonitor
+    var editingService: Service?
     var onDone: () -> Void
 
-    @State private var name: String = ""
-    @State private var type: ServiceType = .ping
-    @State private var host: String = ""
+    @State private var name: String
+    @State private var type: ServiceType
+    @State private var host: String
+
+    init(editingService: Service? = nil, onDone: @escaping () -> Void) {
+        self.editingService = editingService
+        self.onDone = onDone
+        _name = State(initialValue: editingService?.name ?? "")
+        _type = State(initialValue: editingService?.type ?? .ping)
+        _host = State(initialValue: editingService?.host ?? "")
+    }
 
     // Only offer Apple container checks when the CLI is actually installed.
     private var availableTypes: [ServiceType] {
@@ -20,7 +29,7 @@ struct AddServiceView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Add Service")
+            Text(editingService == nil ? "Add Service" : "Edit Service")
                 .font(.headline)
 
             VStack(alignment: .leading, spacing: 8) {
@@ -48,8 +57,13 @@ struct AddServiceView: View {
                 .keyboardShortcut(.cancelAction)
 
                 Button("Save") {
-                    let service = Service(name: name, type: type, host: type == .ping ? host : "")
-                    monitor.addService(service)
+                    let id = editingService?.id ?? UUID()
+                    let service = Service(id: id, name: name, type: type, host: type == .ping ? host : "")
+                    if editingService != nil {
+                        monitor.updateService(service)
+                    } else {
+                        monitor.addService(service)
+                    }
                     onDone()
                 }
                 .keyboardShortcut(.defaultAction)

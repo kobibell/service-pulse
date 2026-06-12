@@ -8,13 +8,18 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject var monitor: ServiceMonitor
     @State private var showingAddForm = false
+    @State private var editingService: Service?
+    @State private var hoveredServiceID: UUID?
     @State private var launchAtLogin = LaunchAtLogin.isEnabled
 
     var body: some View {
         Group {
-            if showingAddForm {
-                AddServiceView(onDone: { showingAddForm = false })
-                    .environmentObject(monitor)
+            if showingAddForm || editingService != nil {
+                AddServiceView(editingService: editingService, onDone: {
+                    showingAddForm = false
+                    editingService = nil
+                })
+                .environmentObject(monitor)
             } else {
                 mainView
             }
@@ -92,6 +97,10 @@ struct ContentView: View {
                                     status: monitor.status(for: service),
                                     latency: monitor.latency(for: service)
                                 )
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    editingService = service
+                                }
 
                                 Button {
                                     monitor.removeService(service)
@@ -103,6 +112,15 @@ struct ContentView: View {
                             }
                             .padding(.horizontal)
                             .padding(.vertical, 4)
+                            .background(hoveredServiceID == service.id ? Color.secondary.opacity(0.1) : Color.clear)
+                            .onHover { isHovering in
+                                hoveredServiceID = isHovering ? service.id : nil
+                                if isHovering {
+                                    NSCursor.pointingHand.push()
+                                } else {
+                                    NSCursor.pop()
+                                }
+                            }
 
                             Divider()
                         }

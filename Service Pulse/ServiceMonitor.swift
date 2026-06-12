@@ -111,6 +111,15 @@ final class ServiceMonitor: ObservableObject {
         pollNow()
     }
 
+    func updateService(_ service: Service) {
+        guard let index = services.firstIndex(where: { $0.id == service.id }) else { return }
+        services[index] = service
+        statuses[service.id] = .unknown
+        latencies[service.id] = nil
+        save()
+        pollNow()
+    }
+
     func removeService(_ service: Service) {
         services.removeAll { $0.id == service.id }
         statuses.removeValue(forKey: service.id)
