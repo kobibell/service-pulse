@@ -75,9 +75,9 @@ are restricted under the App Sandbox. It's distributed outside the App Store as 
 
 ## Roadmap
 
-**Next up**
+**v1.0.1 — shipped**
 - [x] Launch at login
-- [ ] Apple Containers support — monitor containers run with Apple's native
+- [x] Mac Containers support — monitor containers run with Apple's native
       [container](https://github.com/apple/container) tool (Apple Silicon, macOS 26+)
 
 **v1.1 — quality of life**
