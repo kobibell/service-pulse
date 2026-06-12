@@ -18,6 +18,7 @@ struct PingChecker {
             return (.unknown, nil)
         }
 
+        // -c 1: single echo request, -t 3: give up after 3 seconds
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/sbin/ping")
         process.arguments = ["-c", "1", "-t", "3", host]

@@ -72,6 +72,8 @@ final class ServiceMonitor: ObservableObject {
                     latencies[service.id] = nil
                 }
 
+                // Skip the notification on first run, since "unknown -> up/down"
+                // for a freshly-added service isn't a real state change.
                 let newStatus = statuses[service.id] ?? .unknown
                 if previousStatus != .unknown && previousStatus != newStatus {
                     notifyStatusChange(service: service, newStatus: newStatus)

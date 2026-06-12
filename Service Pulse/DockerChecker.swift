@@ -52,6 +52,8 @@ enum DockerChecker {
         setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &timeout, socklen_t(MemoryLayout<timeval>.size))
         setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, &timeout, socklen_t(MemoryLayout<timeval>.size))
 
+        // Copy the socket path into sun_path manually, leaving room for the
+        // trailing null terminator (hence buffer.count - 1).
         var addr = sockaddr_un()
         addr.sun_family = sa_family_t(AF_UNIX)
         let pathBytes = Array(socketPath.utf8)
@@ -100,6 +102,8 @@ enum DockerChecker {
         return Data(body)
     }
 
+    /// The Docker API streams responses with chunked transfer encoding, so
+    /// strip the "<hex length>\r\n...\r\n" framing to get the raw JSON body.
     private static func dechunk(_ data: Data) -> Data {
         var result = Data()
         var remaining = data[...]
