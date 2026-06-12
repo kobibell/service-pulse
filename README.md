@@ -31,31 +31,24 @@ The menubar icon reflects overall status:
 
 ## Installation
 
-### Build from source
+Service Pulse isn't notarized yet, so for now the recommended way to run it is to build it
+yourself — this avoids the macOS Gatekeeper warning entirely, since locally-built apps aren't
+quarantined.
 
 1. Clone the repo:
    ```bash
    git clone https://github.com/kobibell/service-pulse.git
    cd service-pulse
    ```
-2. Open `Service Pulse.xcodeproj` in Xcode
+2. Open `Service Pulse.xcodeproj` in Xcode (16+)
 3. Build and run (⌘R)
 
-### Download the DMG
+The app will launch and appear in your menu bar — no Dock icon, since it's a menubar-only app.
 
-Pre-built DMGs are available on the [Releases](../../releases) page. The app isn't notarized yet,
-so macOS Gatekeeper will say it "cannot be opened because Apple cannot check it for malicious
-software." To open it anyway:
-
-1. Try to open the app once (it'll be blocked)
-2. Go to **System Settings → Privacy & Security**, scroll down to the Security section
-3. Click **Open Anyway** next to "Service Pulse was blocked"
-
-Or from Terminal, after copying the app to `/Applications`:
-
-```bash
-xattr -cr "/Applications/Service Pulse.app"
-```
+A pre-built DMG is also available on the [Releases](../../releases) page, but since it isn't
+notarized, macOS will block it on first launch. If you go that route, see
+[Privacy & Security in System Settings](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unidentified-developer-mh40616/mac)
+for how to allow it, or run `xattr -cr "/Applications/Service Pulse.app"` from Terminal.
 
 ## Usage
 
