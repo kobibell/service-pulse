@@ -18,6 +18,14 @@ and contributions are very welcome.
 - If you're adding a new `ServiceType`, update `Models.swift`, `ServiceMonitor.swift`,
   `AddServiceView.swift`, and `ServiceRow.swift`
 
+## Versioning
+
+Service Pulse follows [semantic versioning](https://semver.org/) (`vMAJOR.MINOR.PATCH`):
+
+- **Major** — breaking changes (data format, major rewrites)
+- **Minor** — new features (new check types, new UI capabilities)
+- **Patch** — bug fixes and small tweaks, no new features
+
 ## Reporting bugs / requesting features
 
 Open an issue with as much detail as possible — macOS version, steps to reproduce, and
