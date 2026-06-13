@@ -42,6 +42,14 @@ enum DockerChecker {
         return allHealthy ? .up : .down
     }
 
+    /// Returns the status of a single container matched by name, or .unknown if not found.
+    static func status(for containerName: String, in containers: [DockerContainer]) -> ServiceStatus {
+        guard let container = containers.first(where: { $0.names.contains(containerName) }) else {
+            return .unknown
+        }
+        return container.state == "running" ? .up : .down
+    }
+
     /// Sends a raw HTTP/1.1 request over the docker unix socket and returns the response body.
     private static func sendRequest(path: String) -> Data? {
         let fd = socket(AF_UNIX, SOCK_STREAM, 0)

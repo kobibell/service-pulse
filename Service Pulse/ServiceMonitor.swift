@@ -84,7 +84,12 @@ final class ServiceMonitor: ObservableObject {
                         DockerChecker.listContainers()
                     }.value
                     if let containers = result {
-                        statuses[service.id] = DockerChecker.overallStatus(for: containers)
+                        let containerName = service.host.trimmingCharacters(in: .whitespaces)
+                        if containerName.isEmpty {
+                            statuses[service.id] = DockerChecker.overallStatus(for: containers)
+                        } else {
+                            statuses[service.id] = DockerChecker.status(for: containerName, in: containers)
+                        }
                     } else {
                         statuses[service.id] = .unknown
                     }
