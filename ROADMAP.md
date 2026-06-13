@@ -11,9 +11,9 @@
 - [x] ~~Pause monitoring~~
 - [x] ~~Status timestamps ("down since…", "last checked…")~~
 
-**v1.2 — more check types**
-- [ ] HTTP/HTTPS endpoint checks with response codes and timing
-- [ ] TCP port checks
+**v1.2 / v1.3 — more check types**
+- [x] ~~HTTP/HTTPS endpoint checks with response codes and timing~~
+- [x] ~~TCP port checks~~
 - [x] ~~Per-container Docker monitoring~~
 
 **Later**
