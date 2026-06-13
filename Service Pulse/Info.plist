@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Service Pulse monitors user-defined endpoints, which are commonly plain
+	     HTTP on arbitrary local-network IPs (e.g. a homelab box reached over a
+	     VPN). Those addresses aren't known at build time, so per-domain ATS
+	     exceptions can't cover them, and NSAllowsLocalNetworking only applies to
+	     loopback/.local hosts. Allowing arbitrary loads is therefore deliberate.
+	     The only first-party network call (the GitHub update check) uses a
+	     hardcoded https:// URL, so this does not downgrade that connection. -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+</dict>
+</plist>

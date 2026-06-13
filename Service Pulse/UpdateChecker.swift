@@ -20,7 +20,11 @@ enum UpdateChecker {
         guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
               let tagName = json["tag_name"] as? String,
               let htmlURLString = json["html_url"] as? String,
-              let htmlURL = URL(string: htmlURLString) else {
+              let htmlURL = URL(string: htmlURLString),
+              htmlURL.scheme == "https" else {
+            // Only accept an https link. Guards against a compromised or MITM'd
+            // update feed handing back an arbitrary URL scheme that later gets
+            // passed to NSWorkspace.open.
             return nil
         }
 

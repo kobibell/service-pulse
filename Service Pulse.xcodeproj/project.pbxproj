@@ -13,10 +13,23 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		490347B12FDB8A9100C08F28 /* Service Pulse */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				490347FF2FDB8A9100C08F28 /* Exceptions for "Service Pulse" folder in "Service Pulse" target */,
+			);
 			path = "Service Pulse";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		490347FF2FDB8A9100C08F28 /* Exceptions for "Service Pulse" folder in "Service Pulse" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 490347AE2FDB8A9100C08F28 /* Service Pulse */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		490347AC2FDB8A9100C08F28 /* Frameworks */ = {
@@ -259,6 +272,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_FILE = "Service Pulse/Info.plist";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Kobi Bell";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -287,6 +301,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_FILE = "Service Pulse/Info.plist";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Kobi Bell";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
