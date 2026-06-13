@@ -6,7 +6,7 @@ A lightweight macOS menubar app that monitors your services and shows their heal
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 <p align="center">
-  <img src="docs/demo.gif" alt="Service Pulse detecting a service going down and showing a notification" width="420">
+  <img src="docs/demo.gif" alt="Service Pulse detecting a service going down and showing a notification" width="600">
 </p>
 
 ## What it does
