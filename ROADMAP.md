@@ -14,7 +14,7 @@
 **v1.2 — more check types**
 - [ ] HTTP/HTTPS endpoint checks with response codes and timing
 - [ ] TCP port checks
-- [ ] Per-container Docker monitoring
+- [x] ~~Per-container Docker monitoring~~
 
 **Later**
 - [ ] Latency history / sparklines
