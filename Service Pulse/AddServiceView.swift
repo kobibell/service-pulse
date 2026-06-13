@@ -43,10 +43,13 @@ struct AddServiceView: View {
                 }
                 .pickerStyle(.segmented)
 
-                TextField("Host (IP or hostname)", text: $host)
-                    .textFieldStyle(.roundedBorder)
-                    .disabled(type != .ping)
-                    .opacity(type == .ping ? 1 : 0)
+                if type == .ping {
+                    TextField("Host (IP or hostname)", text: $host)
+                        .textFieldStyle(.roundedBorder)
+                } else if type == .docker {
+                    TextField("Container name (optional, blank = all containers)", text: $host)
+                        .textFieldStyle(.roundedBorder)
+                }
             }
 
             HStack {
@@ -58,7 +61,7 @@ struct AddServiceView: View {
 
                 Button("Save") {
                     let id = editingService?.id ?? UUID()
-                    let service = Service(id: id, name: name, type: type, host: type == .ping ? host : "")
+                    let service = Service(id: id, name: name, type: type, host: type == .appleContainer ? "" : host)
                     if editingService != nil {
                         monitor.updateService(service)
                     } else {

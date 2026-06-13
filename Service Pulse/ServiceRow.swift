@@ -21,7 +21,7 @@ struct ServiceRow: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(service.name)
                     .font(.body)
-                if service.type == .ping {
+                if service.type == .ping || (service.type == .docker && !service.host.isEmpty) {
                     Text(service.host)
                         .font(.caption)
                         .foregroundStyle(.secondary)
