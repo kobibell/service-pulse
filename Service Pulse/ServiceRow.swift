@@ -9,59 +9,73 @@ struct ServiceRow: View {
     let service: Service
     let status: ServiceStatus
     let latency: Double?
+    let statusCode: Int?
     let lastChecked: Date?
     let statusSince: Date?
 
     var body: some View {
-        HStack {
-            Circle()
-                .fill(statusColor)
-                .frame(width: 8, height: 8)
+        HStack(spacing: 10) {
+            Image(systemName: service.type.symbolName)
+                .font(.body)
+                .foregroundStyle(service.type.isHighlighted ? AnyShapeStyle(.tint) : AnyShapeStyle(.secondary))
+                .frame(width: 20)
+                .help(service.type.displayName)
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text(service.name)
-                    .font(.body)
-                if service.type == .ping || (service.type == .docker && !service.host.isEmpty) {
+            VStack(alignment: .leading, spacing: 1) {
+                HStack(spacing: 6) {
+                    Circle()
+                        .fill(statusColor)
+                        .frame(width: 7, height: 7)
+                    Text(service.name)
+                        .font(.body)
+                }
+                if service.type == .ping || service.type == .http || service.type == .tcp || (service.type == .docker && !service.host.isEmpty) {
                     Text(service.host)
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
                 }
                 if let subtitle {
                     Text(subtitle)
                         .font(.caption2)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.tertiary)
                 }
             }
 
             Spacer()
 
-            if let latency, service.type == .ping {
-                Text("\(Int(latency)) ms")
-                    .font(.caption)
+            if let statusCode, service.type == .http {
+                Text("\(statusCode)")
+                    .font(.caption.monospacedDigit())
                     .foregroundStyle(.secondary)
             }
 
-            Text(service.type.displayName)
-                .font(.caption2)
-                .padding(.horizontal, 6)
-                .padding(.vertical, 2)
-                .background(Color.secondary.opacity(0.15))
-                .clipShape(Capsule())
+            if let latency, service.type == .ping || service.type == .http || service.type == .tcp {
+                Text("\(Int(latency)) ms")
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(.secondary)
+            }
         }
         .padding(.vertical, 2)
     }
 
     private var subtitle: String? {
+        let detail: String?
         if service.isPaused {
-            return "Paused"
+            detail = "Paused"
+        } else if status == .down, let statusSince {
+            detail = "Down since \(Self.timeFormatter.string(from: statusSince))"
+        } else if let lastChecked {
+            detail = "Checked \(Self.timeFormatter.string(from: lastChecked))"
+        } else {
+            detail = nil
         }
-        if status == .down, let statusSince {
-            return "Down since \(Self.timeFormatter.string(from: statusSince))"
+
+        if let detail {
+            return "\(service.type.displayName) · \(detail)"
         }
-        if let lastChecked {
-            return "Checked \(Self.timeFormatter.string(from: lastChecked))"
-        }
-        return nil
+        return service.type.displayName
     }
 
     private static let timeFormatter: DateFormatter = {

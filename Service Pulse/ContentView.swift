@@ -25,7 +25,7 @@ struct ContentView: View {
             }
         }
         .frame(width: 300)
-        .background(.background)
+        .background(.regularMaterial)
     }
 
     private var mainView: some View {
@@ -97,13 +97,15 @@ struct ContentView: View {
                     .padding()
             } else {
                 ScrollView {
-                    VStack(spacing: 0) {
+                    VStack(spacing: 2) {
                         ForEach(monitor.services) { service in
+                            let isHovered = hoveredServiceID == service.id
                             HStack(spacing: 8) {
                                 ServiceRow(
                                     service: service,
                                     status: monitor.status(for: service),
                                     latency: monitor.latency(for: service),
+                                    statusCode: monitor.statusCode(for: service),
                                     lastChecked: monitor.lastChecked(for: service),
                                     statusSince: monitor.statusSince(for: service)
                                 )
@@ -112,37 +114,39 @@ struct ContentView: View {
                                     editingService = service
                                 }
 
-                                Button {
-                                    monitor.togglePause(service)
-                                } label: {
-                                    Image(systemName: service.isPaused ? "play.circle.fill" : "pause.circle.fill")
-                                        .foregroundStyle(.secondary)
+                                if isHovered || service.isPaused {
+                                    Button {
+                                        monitor.togglePause(service)
+                                    } label: {
+                                        Image(systemName: service.isPaused ? "play.circle.fill" : "pause.circle.fill")
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    .buttonStyle(.plain)
                                 }
-                                .buttonStyle(.plain)
 
-                                Button {
-                                    monitor.removeService(service)
-                                } label: {
-                                    Image(systemName: "minus.circle.fill")
-                                        .foregroundStyle(.secondary)
+                                if isHovered {
+                                    Button {
+                                        monitor.removeService(service)
+                                    } label: {
+                                        Image(systemName: "minus.circle.fill")
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    .buttonStyle(.plain)
                                 }
-                                .buttonStyle(.plain)
                             }
-                            .padding(.horizontal)
-                            .padding(.vertical, 4)
-                            .background(hoveredServiceID == service.id ? Color.secondary.opacity(0.1) : Color.clear)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 5)
+                            .background(
+                                RoundedRectangle(cornerRadius: 6)
+                                    .fill(isHovered ? Color.primary.opacity(0.08) : Color.clear)
+                            )
                             .onHover { isHovering in
                                 hoveredServiceID = isHovering ? service.id : nil
-                                if isHovering {
-                                    NSCursor.pointingHand.push()
-                                } else {
-                                    NSCursor.pop()
-                                }
                             }
-
-                            Divider()
                         }
                     }
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 4)
                 }
                 .frame(maxHeight: 300)
             }

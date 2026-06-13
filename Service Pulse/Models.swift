@@ -9,13 +9,33 @@ enum ServiceType: String, Codable, CaseIterable {
     case ping
     case docker
     case appleContainer
+    case http
+    case tcp
 
     var displayName: String {
         switch self {
         case .ping: return "Ping"
         case .docker: return "Docker"
         case .appleContainer: return "Mac Containers"
+        case .http: return "HTTP"
+        case .tcp: return "TCP Port"
         }
+    }
+
+    var symbolName: String {
+        switch self {
+        case .ping: return "dot.radiowaves.left.and.right"
+        case .docker: return "shippingbox"
+        case .appleContainer: return "cube.transparent"
+        case .http: return "globe"
+        case .tcp: return "point.3.connected.trianglepath.dotted"
+        }
+    }
+
+    /// Mac Containers are the headline feature, so their icon gets an accent tint
+    /// to stand out from the otherwise-monochrome service list.
+    var isHighlighted: Bool {
+        self == .appleContainer
     }
 }
 
