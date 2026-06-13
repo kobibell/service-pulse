@@ -28,29 +28,34 @@ struct AddServiceView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 12) {
             Text(editingService == nil ? "Add Service" : "Edit Service")
                 .font(.headline)
 
-            VStack(alignment: .leading, spacing: 8) {
+            Form {
                 TextField("Name", text: $name)
-                    .textFieldStyle(.roundedBorder)
 
                 Picker("Type", selection: $type) {
                     ForEach(availableTypes, id: \.self) { type in
-                        Text(type.displayName).tag(type)
+                        Label(type.displayName, systemImage: type.symbolName).tag(type)
                     }
                 }
-                .pickerStyle(.segmented)
 
-                if type == .ping {
-                    TextField("Host (IP or hostname)", text: $host)
-                        .textFieldStyle(.roundedBorder)
-                } else if type == .docker {
-                    TextField("Container name (optional, blank = all containers)", text: $host)
-                        .textFieldStyle(.roundedBorder)
+                switch type {
+                case .ping:
+                    TextField("Host", text: $host, prompt: Text("IP or hostname"))
+                case .docker:
+                    TextField("Container", text: $host, prompt: Text("Name (blank = all)"))
+                case .http:
+                    TextField("URL", text: $host, prompt: Text("https://example.com"))
+                case .tcp:
+                    TextField("Host:Port", text: $host, prompt: Text("example.com:22"))
+                case .appleContainer:
+                    EmptyView()
                 }
             }
+            .formStyle(.grouped)
+            .scrollContentBackground(.hidden)
 
             HStack {
                 Spacer()
@@ -70,7 +75,7 @@ struct AddServiceView: View {
                     onDone()
                 }
                 .keyboardShortcut(.defaultAction)
-                .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty || (type == .ping && host.trimmingCharacters(in: .whitespaces).isEmpty))
+                .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty || ((type == .ping || type == .http || type == .tcp) && host.trimmingCharacters(in: .whitespaces).isEmpty))
             }
         }
         .padding(20)

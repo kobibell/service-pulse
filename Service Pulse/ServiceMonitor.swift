@@ -12,6 +12,7 @@ final class ServiceMonitor: ObservableObject {
     @Published var services: [Service] = []
     @Published var statuses: [UUID: ServiceStatus] = [:]
     @Published var latencies: [UUID: Double] = [:]
+    @Published var statusCodes: [UUID: Int] = [:]
     @Published var lastChecked: [UUID: Date] = [:]
     @Published var statusSince: [UUID: Date] = [:]
     @Published var overallStatus: OverallStatus = .unknown
@@ -95,6 +96,17 @@ final class ServiceMonitor: ObservableObject {
                     }
                     latencies[service.id] = nil
 
+                case .http:
+                    let result = await HTTPChecker.check(urlString: service.host)
+                    statuses[service.id] = result.status
+                    latencies[service.id] = result.latencyMs
+                    statusCodes[service.id] = result.statusCode
+
+                case .tcp:
+                    let result = await TCPChecker.check(target: service.host)
+                    statuses[service.id] = result.status
+                    latencies[service.id] = result.latencyMs
+
                 case .appleContainer:
                     let result = await Task.detached {
                         AppleContainerChecker.listContainers()
@@ -137,6 +149,7 @@ final class ServiceMonitor: ObservableObject {
         services[index] = service
         statuses[service.id] = .unknown
         latencies[service.id] = nil
+        statusCodes[service.id] = nil
         save()
         pollNow()
     }
@@ -156,6 +169,7 @@ final class ServiceMonitor: ObservableObject {
         services.removeAll { $0.id == service.id }
         statuses.removeValue(forKey: service.id)
         latencies.removeValue(forKey: service.id)
+        statusCodes.removeValue(forKey: service.id)
         save()
         updateOverallStatus()
     }
@@ -166,6 +180,10 @@ final class ServiceMonitor: ObservableObject {
 
     func latency(for service: Service) -> Double? {
         latencies[service.id]
+    }
+
+    func statusCode(for service: Service) -> Int? {
+        statusCodes[service.id]
     }
 
     func lastChecked(for service: Service) -> Date? {
