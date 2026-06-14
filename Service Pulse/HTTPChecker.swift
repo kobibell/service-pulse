@@ -19,6 +19,10 @@ struct HTTPChecker {
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.timeoutInterval = 10
+        // A health check has to hit the server every poll. Without this, URLSession
+        // serves cacheable responses from its local cache, which reports ~0ms
+        // latency and doesn't reflect whether the endpoint is actually live.
+        request.cachePolicy = .reloadIgnoringLocalCacheData
 
         let start = Date()
         do {

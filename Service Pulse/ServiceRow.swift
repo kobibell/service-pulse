@@ -12,6 +12,7 @@ struct ServiceRow: View {
     let statusCode: Int?
     let lastChecked: Date?
     let statusSince: Date?
+    var isHovered: Bool = false
 
     var body: some View {
         HStack(spacing: 10) {
@@ -28,6 +29,8 @@ struct ServiceRow: View {
                         .frame(width: 7, height: 7)
                     Text(service.name)
                         .font(.body)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
                 }
                 if service.type == .ping || service.type == .http || service.type == .tcp || (service.type == .docker && !service.host.isEmpty) {
                     Text(service.host)
@@ -45,16 +48,20 @@ struct ServiceRow: View {
 
             Spacer()
 
-            if let statusCode, service.type == .http {
-                Text("\(statusCode)")
-                    .font(.caption.monospacedDigit())
-                    .foregroundStyle(.secondary)
-            }
+            // Hide the metrics on hover so the pause/remove buttons have room
+            // without crowding the row or forcing the name to truncate.
+            if !isHovered {
+                if let statusCode, service.type == .http {
+                    Text("\(statusCode)")
+                        .font(.caption.monospacedDigit())
+                        .foregroundStyle(.secondary)
+                }
 
-            if let latency, service.type == .ping || service.type == .http || service.type == .tcp {
-                Text("\(Int(latency)) ms")
-                    .font(.caption.monospacedDigit())
-                    .foregroundStyle(.secondary)
+                if let latency, service.type == .ping || service.type == .http || service.type == .tcp {
+                    Text("\(Int(latency)) ms")
+                        .font(.caption.monospacedDigit())
+                        .foregroundStyle(.secondary)
+                }
             }
         }
         .padding(.vertical, 2)

@@ -107,7 +107,8 @@ struct ContentView: View {
                                     latency: monitor.latency(for: service),
                                     statusCode: monitor.statusCode(for: service),
                                     lastChecked: monitor.lastChecked(for: service),
-                                    statusSince: monitor.statusSince(for: service)
+                                    statusSince: monitor.statusSince(for: service),
+                                    isHovered: isHovered
                                 )
                                 .contentShape(Rectangle())
                                 .onTapGesture {
