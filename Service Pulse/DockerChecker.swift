@@ -13,7 +13,22 @@ struct DockerContainer {
 }
 
 enum DockerChecker {
-    static let socketPath = "/var/run/docker.sock"
+    /// Resolves the Docker socket location. Docker Desktop and the CLI put it in
+    /// different places depending on version and configuration, so probe the
+    /// common locations rather than assuming the legacy /var/run path exists.
+    static var socketPath: String? {
+        // An explicit unix:// DOCKER_HOST wins if the user has set one.
+        if let host = ProcessInfo.processInfo.environment["DOCKER_HOST"],
+           host.hasPrefix("unix://") {
+            return String(host.dropFirst("unix://".count))
+        }
+
+        let candidates = [
+            "\(NSHomeDirectory())/.docker/run/docker.sock",
+            "/var/run/docker.sock"
+        ]
+        return candidates.first { FileManager.default.fileExists(atPath: $0) }
+    }
 
     /// Returns nil if the docker socket is unreachable.
     static func listContainers() -> [DockerContainer]? {
@@ -52,6 +67,8 @@ enum DockerChecker {
 
     /// Sends a raw HTTP/1.1 request over the docker unix socket and returns the response body.
     private static func sendRequest(path: String) -> Data? {
+        guard let socketPath else { return nil }
+
         let fd = socket(AF_UNIX, SOCK_STREAM, 0)
         guard fd >= 0 else { return nil }
         defer { close(fd) }
