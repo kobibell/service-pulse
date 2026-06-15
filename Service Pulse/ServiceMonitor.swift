@@ -195,12 +195,15 @@ final class ServiceMonitor: ObservableObject {
     }
 
     private func updateOverallStatus() {
-        if services.isEmpty {
+        // Paused services are intentionally not being checked, so they must not
+        // drag the overall status (and the menu bar icon) toward unknown/gray.
+        let active = services.filter { !$0.isPaused }
+        if active.isEmpty {
             overallStatus = .unknown
             return
         }
 
-        let currentStatuses = services.map { statuses[$0.id] ?? .unknown }
+        let currentStatuses = active.map { statuses[$0.id] ?? .unknown }
 
         if currentStatuses.allSatisfy({ $0 == .up }) {
             overallStatus = .allGood
@@ -244,13 +247,24 @@ final class ServiceMonitor: ObservableObject {
     }
 
     private func load() {
+        guard let data = try? Data(contentsOf: storageURL) else {
+            services = []
+            return
+        }
+
         do {
-            let data = try Data(contentsOf: storageURL)
-            services = try JSONDecoder().decode([Service].self, from: data)
+            // Decode entry-by-entry so a single service that fails to decode
+            // (e.g. one with a check type written by a newer app version) is
+            // skipped rather than discarding every saved service.
+            let entries = try JSONDecoder().decode([FailableService].self, from: data)
+            services = entries.compactMap(\.service)
             for service in services {
                 statuses[service.id] = .unknown
             }
         } catch {
+            // The file isn't a decodable array at all. Preserve it for debugging
+            // instead of silently overwriting it on the next save.
+            try? data.write(to: storageURL.appendingPathExtension("bak"), options: .atomic)
             services = []
         }
     }

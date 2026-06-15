@@ -76,3 +76,15 @@ struct Service: Identifiable, Codable {
         isPaused = try container.decodeIfPresent(Bool.self, forKey: .isPaused) ?? false
     }
 }
+
+/// Decodes to a `Service?`, yielding nil instead of throwing when an individual
+/// entry can't be decoded. Lets `load()` skip a single unreadable service (for
+/// example one whose type was written by a newer build) rather than dropping the
+/// entire saved list.
+struct FailableService: Decodable {
+    let service: Service?
+
+    init(from decoder: Decoder) throws {
+        service = try? Service(from: decoder)
+    }
+}
