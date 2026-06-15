@@ -61,79 +61,92 @@ final class ServiceMonitor: ObservableObject {
     }
 
     func pollNow() {
+        // Don't start a new poll while one is in flight; otherwise overlapping
+        // runs can emit duplicate notifications and fight over isRefreshing.
+        guard !isRefreshing else { return }
         isRefreshing = true
-        let currentServices = services
+
+        let toCheck = services.filter { !$0.isPaused }
 
         Task {
-            for service in currentServices {
-                if service.isPaused {
-                    continue
+            // Run every check concurrently so the poll takes as long as the
+            // slowest single service, not the sum of all of them.
+            let results = await withTaskGroup(of: CheckResult.self) { group in
+                for service in toCheck {
+                    group.addTask { await Self.performCheck(for: service) }
                 }
-
-                let previousStatus = statuses[service.id] ?? .unknown
-
-                switch service.type {
-                case .ping:
-                    let result = await Task.detached {
-                        PingChecker.check(host: service.host)
-                    }.value
-                    statuses[service.id] = result.status
-                    latencies[service.id] = result.latencyMs
-
-                case .docker:
-                    let result = await Task.detached {
-                        DockerChecker.listContainers()
-                    }.value
-                    if let containers = result {
-                        let containerName = service.host.trimmingCharacters(in: .whitespaces)
-                        if containerName.isEmpty {
-                            statuses[service.id] = DockerChecker.overallStatus(for: containers)
-                        } else {
-                            statuses[service.id] = DockerChecker.status(for: containerName, in: containers)
-                        }
-                    } else {
-                        statuses[service.id] = .unknown
-                    }
-                    latencies[service.id] = nil
-
-                case .http:
-                    let result = await HTTPChecker.check(urlString: service.host)
-                    statuses[service.id] = result.status
-                    latencies[service.id] = result.latencyMs
-                    statusCodes[service.id] = result.statusCode
-
-                case .tcp:
-                    let result = await TCPChecker.check(target: service.host)
-                    statuses[service.id] = result.status
-                    latencies[service.id] = result.latencyMs
-
-                case .appleContainer:
-                    let result = await Task.detached {
-                        AppleContainerChecker.listContainers()
-                    }.value
-                    if let containers = result {
-                        statuses[service.id] = AppleContainerChecker.overallStatus(for: containers)
-                    } else {
-                        statuses[service.id] = .unknown
-                    }
-                    latencies[service.id] = nil
+                var collected: [CheckResult] = []
+                for await result in group {
+                    collected.append(result)
                 }
-
-                lastChecked[service.id] = Date()
-
-                // Skip the notification on first run, since "unknown -> up/down"
-                // for a freshly-added service isn't a real state change.
-                let newStatus = statuses[service.id] ?? .unknown
-                if newStatus != previousStatus {
-                    statusSince[service.id] = Date()
-                }
-                if previousStatus != .unknown && previousStatus != newStatus {
-                    notifyStatusChange(service: service, newStatus: newStatus)
-                }
+                return collected
             }
 
+            applyResults(results)
             updateOverallStatus()
             isRefreshing = false
+        }
+    }
+
+    /// Runs the appropriate checker for a service off the main actor. Reads only
+    /// the passed-in value, so it touches no actor-isolated state and is safe to
+    /// fan out across a task group.
+    nonisolated private static func performCheck(for service: Service) async -> CheckResult {
+        switch service.type {
+        case .ping:
+            let result = await Task.detached { PingChecker.check(host: service.host) }.value
+            return CheckResult(id: service.id, status: result.status, latency: result.latencyMs, statusCode: nil)
+
+        case .docker:
+            let containers = await Task.detached { DockerChecker.listContainers() }.value
+            let status: ServiceStatus
+            if let containers {
+                let name = service.host.trimmingCharacters(in: .whitespaces)
+                status = name.isEmpty
+                    ? DockerChecker.overallStatus(for: containers)
+                    : DockerChecker.status(for: name, in: containers)
+            } else {
+                status = .unknown
+            }
+            return CheckResult(id: service.id, status: status, latency: nil, statusCode: nil)
+
+        case .http:
+            let result = await HTTPChecker.check(urlString: service.host)
+            return CheckResult(id: service.id, status: result.status, latency: result.latencyMs, statusCode: result.statusCode)
+
+        case .tcp:
+            let result = await TCPChecker.check(target: service.host)
+            return CheckResult(id: service.id, status: result.status, latency: result.latencyMs, statusCode: nil)
+
+        case .appleContainer:
+            let containers = await Task.detached { AppleContainerChecker.listContainers() }.value
+            let status = containers.map { AppleContainerChecker.overallStatus(for: $0) } ?? .unknown
+            return CheckResult(id: service.id, status: status, latency: nil, statusCode: nil)
+        }
+    }
+
+    /// Applies collected check results to the published state on the main actor.
+    private func applyResults(_ results: [CheckResult]) {
+        for result in results {
+            // The service may have been removed while the poll was running; if so,
+            // don't re-create dictionary entries for it.
+            guard let service = services.first(where: { $0.id == result.id }) else { continue }
+
+            let previousStatus = statuses[result.id] ?? .unknown
+
+            statuses[result.id] = result.status
+            latencies[result.id] = result.latency
+            statusCodes[result.id] = result.statusCode
+            lastChecked[result.id] = Date()
+
+            if result.status != previousStatus {
+                statusSince[result.id] = Date()
+            }
+            // Skip the notification on first run, since "unknown -> up/down"
+            // for a freshly-added service isn't a real state change.
+            if previousStatus != .unknown && previousStatus != result.status {
+                notifyStatusChange(service: service, newStatus: result.status)
+            }
         }
     }
 

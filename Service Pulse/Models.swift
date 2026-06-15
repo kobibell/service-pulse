@@ -45,6 +45,15 @@ enum ServiceStatus: String, Codable {
     case unknown
 }
 
+/// The outcome of checking a single service, passed back from a concurrent
+/// poll task to the main actor for application to published state.
+struct CheckResult: Sendable {
+    let id: UUID
+    let status: ServiceStatus
+    let latency: Double?
+    let statusCode: Int?
+}
+
 enum OverallStatus {
     case allGood
     case degraded

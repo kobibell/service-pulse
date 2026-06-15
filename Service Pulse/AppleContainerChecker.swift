@@ -29,7 +29,10 @@ enum AppleContainerChecker {
 
         let stdout = Pipe()
         process.standardOutput = stdout
-        process.standardError = Pipe()
+        // Discard stderr rather than wiring an undrained pipe: if the CLI wrote
+        // more than a pipe buffer to stderr, it would block and the stdout read
+        // below would deadlock waiting for an EOF that never comes.
+        process.standardError = FileHandle.nullDevice
 
         do {
             try process.run()
@@ -37,8 +40,18 @@ enum AppleContainerChecker {
             return nil
         }
 
+        // Watchdog so a wedged CLI (e.g. a stuck apiserver) can't block the read
+        // indefinitely. Terminating the process closes stdout, freeing the read.
+        let watchdog = DispatchWorkItem {
+            if process.isRunning {
+                process.terminate()
+            }
+        }
+        DispatchQueue.global().asyncAfter(deadline: .now() + 5, execute: watchdog)
+
         let data = stdout.fileHandleForReading.readDataToEndOfFile()
         process.waitUntilExit()
+        watchdog.cancel()
         guard process.terminationStatus == 0 else { return nil }
 
         guard let json = try? JSONSerialization.jsonObject(with: data) as? [[String: Any]] else {
