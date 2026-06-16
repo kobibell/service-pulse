@@ -111,7 +111,7 @@ final class ServiceMonitor: ObservableObject {
             return CheckResult(id: service.id, status: status, latency: nil, statusCode: nil)
 
         case .http:
-            let result = await HTTPChecker.check(urlString: service.host)
+            let result = await HTTPChecker.check(urlString: service.host, allowInsecure: service.allowInsecureTLS)
             return CheckResult(id: service.id, status: result.status, latency: result.latencyMs, statusCode: result.statusCode)
 
         case .tcp:
@@ -255,7 +255,8 @@ final class ServiceMonitor: ObservableObject {
             let data = try JSONEncoder().encode(services)
             try data.write(to: storageURL, options: .atomic)
         } catch {
-            print("Failed to save services: \(error)")
+            // Persisting config failed; nothing actionable to surface here. The
+            // in-memory service list stays intact for this session.
         }
     }
 

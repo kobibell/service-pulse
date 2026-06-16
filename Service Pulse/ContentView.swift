@@ -28,6 +28,11 @@ struct ContentView: View {
         .background(.regularMaterial)
     }
 
+    private var appVersion: String {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
+        return "v\(version)"
+    }
+
     private var mainView: some View {
         VStack(spacing: 0) {
             HStack {
@@ -50,6 +55,10 @@ struct ContentView: View {
                 .disabled(monitor.isRefreshing)
 
                 Menu {
+                    Text("Service Pulse \(appVersion)")
+
+                    Divider()
+
                     if let update = monitor.availableUpdate {
                         Button("Update available: v\(update.version)") {
                             NSWorkspace.shared.open(update.url)

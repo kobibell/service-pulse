@@ -67,13 +67,16 @@ struct Service: Identifiable, Codable {
     var type: ServiceType
     var host: String
     var isPaused: Bool = false
+    /// For HTTP checks only: accept self-signed / untrusted certificates.
+    var allowInsecureTLS: Bool = false
 
-    init(id: UUID = UUID(), name: String, type: ServiceType, host: String, isPaused: Bool = false) {
+    init(id: UUID = UUID(), name: String, type: ServiceType, host: String, isPaused: Bool = false, allowInsecureTLS: Bool = false) {
         self.id = id
         self.name = name
         self.type = type
         self.host = host
         self.isPaused = isPaused
+        self.allowInsecureTLS = allowInsecureTLS
     }
 
     init(from decoder: Decoder) throws {
@@ -83,6 +86,8 @@ struct Service: Identifiable, Codable {
         type = try container.decode(ServiceType.self, forKey: .type)
         host = try container.decode(String.self, forKey: .host)
         isPaused = try container.decodeIfPresent(Bool.self, forKey: .isPaused) ?? false
+        // Added after the first releases, so older saved configs won't have it.
+        allowInsecureTLS = try container.decodeIfPresent(Bool.self, forKey: .allowInsecureTLS) ?? false
     }
 }
 

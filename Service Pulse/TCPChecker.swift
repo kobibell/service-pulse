@@ -7,13 +7,38 @@ import Foundation
 import Network
 
 struct TCPChecker {
-    /// Expects "host:port". Returns nil status code components if the format is invalid.
+    /// Parses "host:port", including bracketed IPv6 literals like "[::1]:8080".
+    /// Returns nil when the format is invalid or the port is out of range.
+    static func parseTarget(_ target: String) -> (host: String, port: UInt16)? {
+        let trimmed = target.trimmingCharacters(in: .whitespaces)
+
+        // Bracketed IPv6: [host]:port
+        if trimmed.hasPrefix("[") {
+            guard let close = trimmed.firstIndex(of: "]") else { return nil }
+            let host = String(trimmed[trimmed.index(after: trimmed.startIndex)..<close])
+            let rest = trimmed[trimmed.index(after: close)...]
+            guard rest.hasPrefix(":"), let port = UInt16(rest.dropFirst()), !host.isEmpty else {
+                return nil
+            }
+            return (host, port)
+        }
+
+        // host:port — split on the last colon. A bare (unbracketed) IPv6 literal
+        // has multiple colons and is rejected here; it must use brackets.
+        guard let lastColon = trimmed.lastIndex(of: ":") else { return nil }
+        let host = String(trimmed[..<lastColon])
+        let portString = trimmed[trimmed.index(after: lastColon)...]
+        guard !host.isEmpty, !host.contains(":"), let port = UInt16(portString) else {
+            return nil
+        }
+        return (host, port)
+    }
+
     static func check(target: String) async -> (status: ServiceStatus, latencyMs: Double?) {
-        let parts = target.split(separator: ":")
-        guard parts.count == 2, let port = UInt16(parts[1]), let portValue = NWEndpoint.Port(rawValue: port) else {
+        guard let parsed = parseTarget(target), let portValue = NWEndpoint.Port(rawValue: parsed.port) else {
             return (.unknown, nil)
         }
-        let host = String(parts[0])
+        let host = parsed.host
 
         let connection = NWConnection(host: NWEndpoint.Host(host), port: portValue, using: .tcp)
         let start = Date()

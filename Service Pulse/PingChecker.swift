@@ -18,10 +18,19 @@ struct PingChecker {
             return (.unknown, nil)
         }
 
-        // -c 1: single echo request, -t 3: give up after 3 seconds
+        // /sbin/ping is IPv4-only; an IPv6 literal (contains ':') needs ping6.
+        let isIPv6 = host.contains(":")
+
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/sbin/ping")
-        process.arguments = ["-c", "1", "-t", "3", host]
+        if isIPv6 {
+            // ping6 has no total-timeout flag, so a watchdog bounds it below.
+            process.executableURL = URL(fileURLWithPath: "/sbin/ping6")
+            process.arguments = ["-c", "1", host]
+        } else {
+            // -c 1: single echo request, -t 3: give up after 3 seconds
+            process.executableURL = URL(fileURLWithPath: "/sbin/ping")
+            process.arguments = ["-c", "1", "-t", "3", host]
+        }
 
         let pipe = Pipe()
         process.standardOutput = pipe
@@ -29,12 +38,23 @@ struct PingChecker {
 
         do {
             try process.run()
-            process.waitUntilExit()
         } catch {
             return (.unknown, nil)
         }
 
+        // Safety net so a check can't hang (notably ping6, which lacks -t).
+        let watchdog = DispatchWorkItem {
+            if process.isRunning {
+                process.terminate()
+            }
+        }
+        DispatchQueue.global().asyncAfter(deadline: .now() + 4, execute: watchdog)
+
+        // Read before waiting so terminating the process releases the read.
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        process.waitUntilExit()
+        watchdog.cancel()
+
         guard let output = String(data: data, encoding: .utf8) else {
             return (.unknown, nil)
         }
