@@ -18,7 +18,8 @@ enum LaunchAtLogin {
                 try SMAppService.mainApp.unregister()
             }
         } catch {
-            print("Failed to update login item: \(error)")
+            // Registering the login item can fail (e.g. denied); leave the
+            // toggle reflecting the actual SMAppService state on next read.
         }
     }
 }
