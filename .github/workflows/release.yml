@@ -15,6 +15,27 @@ jobs:
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
+      - name: Import Developer ID certificate
+        env:
+          CERT_P12: ${{ secrets.DEVELOPER_ID_CERT_P12 }}
+          CERT_PASSWORD: ${{ secrets.DEVELOPER_ID_CERT_PASSWORD }}
+        run: |
+          KEYCHAIN_PATH="$RUNNER_TEMP/build.keychain"
+          KEYCHAIN_PASSWORD="$(openssl rand -hex 16)"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          echo "$CERT_P12" | base64 --decode -o "$RUNNER_TEMP/cert.p12"
+          security import "$RUNNER_TEMP/cert.p12" \
+            -k "$KEYCHAIN_PATH" \
+            -P "$CERT_PASSWORD" \
+            -T /usr/bin/codesign
+          security list-keychain -d user -s "$KEYCHAIN_PATH" login.keychain
+          security set-key-partition-list \
+            -S apple-tool:,apple: \
+            -s -k "$KEYCHAIN_PASSWORD" \
+            "$KEYCHAIN_PATH"
+
       - name: Archive
         run: |
           xcodebuild archive \
@@ -22,16 +43,59 @@ jobs:
             -scheme "Service Pulse" \
             -configuration Release \
             -archivePath "build/Service Pulse.xcarchive" \
-            CODE_SIGN_IDENTITY="-" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=YES \
             | { grep -E "error:|warning:|BUILD" || true; }
 
-      - name: Package DMG
+      - name: Re-sign with Developer ID
+        run: |
+          APP_PATH="build/export/Service Pulse.app"
+          mkdir -p build/export
+          cp -R "build/Service Pulse.xcarchive/Products/Applications/Service Pulse.app" "$APP_PATH"
+          codesign \
+            --force \
+            --options runtime \
+            --timestamp \
+            --sign "Developer ID Application: Kobi Bell (DJ5F2VD3UK)" \
+            "$APP_PATH"
+          CODESIGN_OUT=$(codesign -dvvv "$APP_PATH" 2>&1)
+          if ! echo "$CODESIGN_OUT" | grep -q "Authority=Developer ID Application"; then
+            echo "ERROR: Missing Developer ID authority. Aborting."
+            exit 1
+          fi
+          if ! echo "$CODESIGN_OUT" | grep -q "Timestamp="; then
+            echo "ERROR: Missing secure timestamp. Aborting."
+            exit 1
+          fi
+          echo "Signature OK."
+
+      - name: Install create-dmg
+        run: brew install create-dmg
+
+      - name: Create DMG
         run: |
           APP_NAME="Service Pulse"
-          mkdir -p build/dmg-staging
-          cp -R "build/$APP_NAME.xcarchive/Products/Applications/$APP_NAME.app" build/dmg-staging/
-          ln -s /Applications "build/dmg-staging/Applications"
-          hdiutil create -volname "$APP_NAME" -srcfolder build/dmg-staging -ov -format UDZO "build/$APP_NAME.dmg"
+          create-dmg \
+            --volname "$APP_NAME" \
+            --window-pos 200 120 \
+            --window-size 660 400 \
+            --icon-size 120 \
+            --icon "$APP_NAME.app" 180 185 \
+            --app-drop-link 480 185 \
+            --hide-extension "$APP_NAME.app" \
+            "build/$APP_NAME.dmg" \
+            "build/export/"
+
+      - name: Notarize and staple
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+        run: |
+          xcrun notarytool submit "build/Service Pulse.dmg" \
+            --apple-id "$APPLE_ID" \
+            --team-id "$APPLE_TEAM_ID" \
+            --password "$APPLE_APP_PASSWORD" \
+            --wait
+          xcrun stapler staple "build/Service Pulse.dmg"
 
       - name: Create release
         env:
