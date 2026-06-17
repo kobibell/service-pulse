@@ -37,20 +37,15 @@ The menubar icon reflects overall status:
 
 1. Download the latest DMG from the [Releases](../../releases) page
 2. Open the DMG and drag **Service Pulse** into your Applications folder
-3. Service Pulse isn't notarized yet, so macOS will block it on first launch with a
-   "cannot be opened" message. To allow it, open Terminal and run:
-   ```bash
-   xattr -cr "/Applications/Service Pulse.app"
-   ```
-   Then open the app again from Applications. (Alternatively, go to **System Settings →
-   Privacy & Security** and click **Open Anyway** next to the warning.)
+3. Open Service Pulse from Applications
 
-The app will launch and appear in your menu bar — no Dock icon, since it's a menubar-only app.
+The app is signed with a Developer ID and notarized by Apple, so it opens without any
+Gatekeeper warnings. It will launch and appear in your menu bar — no Dock icon, since
+it's a menubar-only app.
 
 ### Building from source
 
-If you'd rather not run the `xattr` command, or want to make changes, you can build it
-yourself with Xcode (16+):
+If you'd rather make changes, you can build it yourself with Xcode (16+):
 
 ```bash
 git clone https://github.com/kobibell/service-pulse.git
@@ -58,8 +53,7 @@ cd service-pulse
 open "Service Pulse.xcodeproj"
 ```
 
-Then build and run (⌘R). Locally-built apps aren't quarantined, so this skips the Gatekeeper
-warning entirely.
+Then build and run (⌘R).
 
 ## Usage
 
