@@ -1,17 +1,17 @@
 # Roadmap
 
-**v1.0.1 — shipped**
+**v1.0.1 (shipped)**
 - [x] ~~Launch at login~~
-- [x] ~~Mac Containers support~~ — monitor containers run with Apple's native
+- [x] ~~Mac Containers support~~: monitor containers run with Apple's native
       [container](https://github.com/apple/container) tool (Apple Silicon, macOS 26+)
 
-**v1.1 — shipped**
+**v1.1 (shipped)**
 - [x] ~~Configurable poll interval~~
 - [x] ~~Edit existing services~~
 - [x] ~~Pause monitoring~~
 - [x] ~~Status timestamps ("down since…", "last checked…")~~
 
-**v1.2 / v1.3 — more check types**
+**v1.2 / v1.3 (more check types)**
 - [x] ~~HTTP/HTTPS endpoint checks with response codes and timing~~
 - [x] ~~TCP port checks~~
 - [x] ~~Per-container Docker monitoring~~

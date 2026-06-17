@@ -29,7 +29,7 @@ Out of scope:
 
 A few security-relevant decisions documented for transparency:
 
-- **No sandbox.** Service Pulse runs `/sbin/ping` and reads `/var/run/docker.sock` directly — both require entitlements incompatible with the macOS App Sandbox. The app is distributed outside the App Store as a result.
+- **No sandbox.** Service Pulse runs `/sbin/ping` and reads `/var/run/docker.sock` directly, and both require entitlements incompatible with the macOS App Sandbox. The app is distributed outside the App Store as a result.
 - **No telemetry.** No data leaves your machine. There are no analytics, crash reporters, or network calls beyond the health checks you configure.
 - **Unnotarized builds.** Current releases are not notarized. Installation requires running `xattr -cr "/Applications/Service Pulse.app"` to clear the Gatekeeper quarantine flag. Notarization is planned once the project reaches sustainable traction.
 - **Open source.** The full source is available for review. If something looks off, open a discussion or follow the reporting process above.

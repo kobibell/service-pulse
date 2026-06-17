@@ -13,11 +13,11 @@ A lightweight macOS menubar app that monitors your services and shows their heal
 
 Service Pulse sits in your menu bar and keeps an eye on the things you care about:
 
-- **Ping checks** — ICMP ping to any host or IP, with live latency
-- **Docker checks** — reads your local Docker socket and reports container health
+- **Ping checks**: ICMP ping to any host or IP, with live latency
+- **Docker checks**: reads your local Docker socket and reports container health
 - **Background polling** every 30 seconds, plus a manual refresh button
 - **Native notifications** when something goes down or comes back up
-- **Local-only** — no servers, no telemetry, no accounts. Everything runs and stays on your Mac
+- **Local-only**: no servers, no telemetry, no accounts. Everything runs and stays on your Mac
 
 The menubar icon reflects overall status:
 
@@ -40,7 +40,7 @@ The menubar icon reflects overall status:
 3. Open Service Pulse from Applications
 
 The app is signed with a Developer ID and notarized by Apple, so it opens without any
-Gatekeeper warnings. It will launch and appear in your menu bar — no Dock icon, since
+Gatekeeper warnings. It will launch and appear in your menu bar, with no Dock icon, since
 it's a menubar-only app.
 
 ### Building from source
@@ -89,5 +89,5 @@ Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for gui
 ## License
 
 Source code is licensed under the [MIT License](LICENSE). The "Service Pulse" name and logo are
-trademarks and may not be reused in forks or derivative distributions — see the LICENSE file for
+trademarks and may not be reused in forks or derivative distributions. See the LICENSE file for
 details.

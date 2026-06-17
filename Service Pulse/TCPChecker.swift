@@ -23,7 +23,7 @@ struct TCPChecker {
             return (host, port)
         }
 
-        // host:port — split on the last colon. A bare (unbracketed) IPv6 literal
+        // host:port, split on the last colon. A bare (unbracketed) IPv6 literal
         // has multiple colons and is rejected here; it must use brackets.
         guard let lastColon = trimmed.lastIndex(of: ":") else { return nil }
         let host = String(trimmed[..<lastColon])

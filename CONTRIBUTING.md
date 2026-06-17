@@ -11,10 +11,10 @@ and contributions are very welcome.
 
 ## Guidelines
 
-- Keep the app **native and dependency-free** — no third-party packages
+- Keep the app **native and dependency-free**: no third-party packages
 - Match the existing style: minimal, native SwiftUI, no unnecessary abstractions
 - New checker types (HTTP, TCP, process, etc.) should follow the pattern of
-  `PingChecker.swift` / `DockerChecker.swift` — a simple struct/enum with a static check function
+  `PingChecker.swift` / `DockerChecker.swift`, a simple struct/enum with a static check function
 - If you're adding a new `ServiceType`, update `Models.swift`, `ServiceMonitor.swift`,
   `AddServiceView.swift`, and `ServiceRow.swift`
 
@@ -22,13 +22,13 @@ and contributions are very welcome.
 
 Service Pulse follows [semantic versioning](https://semver.org/) (`vMAJOR.MINOR.PATCH`):
 
-- **Major** — breaking changes (data format, major rewrites)
-- **Minor** — new features (new check types, new UI capabilities)
-- **Patch** — bug fixes and small tweaks, no new features
+- **Major**: breaking changes (data format, major rewrites)
+- **Minor**: new features (new check types, new UI capabilities)
+- **Patch**: bug fixes and small tweaks, no new features
 
 ## Reporting bugs / requesting features
 
-Open an issue with as much detail as possible — macOS version, steps to reproduce, and
+Open an issue with as much detail as possible: macOS version, steps to reproduce, and
 screenshots if relevant.
 
 ## Pull requests
@@ -39,5 +39,5 @@ screenshots if relevant.
 
 ## Branding
 
-Please don't reuse the "Service Pulse" name or app icon in forks or redistributions — see the
+Please don't reuse the "Service Pulse" name or app icon in forks or redistributions. See the
 LICENSE file for details. Feel free to pick your own name if you're shipping a fork!
