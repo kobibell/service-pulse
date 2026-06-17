@@ -17,3 +17,4 @@ xcuserdata/
 .swiftpm/
 .claude/
 /logo.png
+scripts/.env

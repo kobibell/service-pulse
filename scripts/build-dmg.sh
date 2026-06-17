@@ -19,6 +19,16 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
+# Load notarization credentials from scripts/.env if present (gitignored).
+# Variables set in the environment take precedence over the file.
+ENV_FILE="$ROOT_DIR/scripts/.env"
+if [ -f "$ENV_FILE" ]; then
+  set -a
+  # shellcheck source=/dev/null
+  source "$ENV_FILE"
+  set +a
+fi
+
 APP_NAME="Service Pulse"
 SCHEME="Service Pulse"
 PROJECT="Service Pulse.xcodeproj"
