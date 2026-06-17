@@ -37,7 +37,6 @@ BUILD_DIR="$ROOT_DIR/build"
 ARCHIVE_PATH="$BUILD_DIR/$APP_NAME.xcarchive"
 EXPORT_PATH="$BUILD_DIR/export"
 DMG_PATH="$BUILD_DIR/$APP_NAME.dmg"
-DMG_STAGING="$BUILD_DIR/dmg-staging"
 
 rm -rf "$BUILD_DIR"
 mkdir -p "$BUILD_DIR"
@@ -77,19 +76,18 @@ if ! echo "$CODESIGN_OUT" | grep -q "Timestamp="; then
 fi
 echo "    Signature OK (Developer ID + timestamp confirmed)."
 
-echo "==> Staging DMG contents..."
-mkdir -p "$DMG_STAGING"
-cp -R "$EXPORT_PATH/$APP_NAME.app" "$DMG_STAGING/"
-ln -s /Applications "$DMG_STAGING/Applications"
-
 echo "==> Creating DMG..."
 rm -f "$DMG_PATH"
-hdiutil create \
-  -volname "$APP_NAME" \
-  -srcfolder "$DMG_STAGING" \
-  -ov \
-  -format UDZO \
-  "$DMG_PATH"
+create-dmg \
+  --volname "$APP_NAME" \
+  --window-pos 200 120 \
+  --window-size 660 400 \
+  --icon-size 120 \
+  --icon "$APP_NAME.app" 180 185 \
+  --app-drop-link 480 185 \
+  --hide-extension "$APP_NAME.app" \
+  "$DMG_PATH" \
+  "$EXPORT_PATH/"
 
 if [ "${NOTARIZE:-0}" = "1" ]; then
   echo "==> Submitting for notarization..."
