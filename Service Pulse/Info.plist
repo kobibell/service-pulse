@@ -9,6 +9,8 @@
 	     loopback/.local hosts. Allowing arbitrary loads is therefore deliberate.
 	     The only first-party network call (the GitHub update check) uses a
 	     hardcoded https:// URL, so this does not downgrade that connection. -->
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.utilities</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>

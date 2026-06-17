@@ -44,6 +44,29 @@ echo "==> Exporting app from archive..."
 mkdir -p "$EXPORT_PATH"
 cp -R "$ARCHIVE_PATH/Products/Applications/$APP_NAME.app" "$EXPORT_PATH/"
 
+DEVELOPER_ID="Developer ID Application: Kobi Bell (DJ5F2VD3UK)"
+APP_PATH="$EXPORT_PATH/$APP_NAME.app"
+
+echo "==> Re-signing with Developer ID (hardened runtime + secure timestamp)..."
+codesign \
+  --force \
+  --options runtime \
+  --timestamp \
+  --sign "$DEVELOPER_ID" \
+  "$APP_PATH"
+
+echo "==> Verifying signature..."
+CODESIGN_OUT=$(codesign -dvvv "$APP_PATH" 2>&1)
+if ! echo "$CODESIGN_OUT" | grep -q "Authority=Developer ID Application"; then
+  echo "ERROR: Signed app does not contain a Developer ID Application authority. Aborting."
+  exit 1
+fi
+if ! echo "$CODESIGN_OUT" | grep -q "Timestamp="; then
+  echo "ERROR: Signature does not include a secure timestamp. Aborting."
+  exit 1
+fi
+echo "    Signature OK (Developer ID + timestamp confirmed)."
+
 echo "==> Staging DMG contents..."
 mkdir -p "$DMG_STAGING"
 cp -R "$EXPORT_PATH/$APP_NAME.app" "$DMG_STAGING/"
